@@ -18,7 +18,7 @@
 #include <libhal-arm-mcu/stm32f1/output_pin.hpp>
 #include <libhal-arm-mcu/stm32f1/uart.hpp>
 #include <libhal-arm-mcu/system_control.hpp>
-
+#include <libhal-soft/bit_bang_i2c.hpp>
 #include <resource_list.hpp>
 
 void initialize_platform(resource_list& p_list)
@@ -42,4 +42,17 @@ void initialize_platform(resource_list& p_list)
                                     .baud_rate = 115200,
                                   });
   p_list.console = &uart1;
+
+  static hal::stm32f1::output_pin sda('A', 0);
+  static hal::stm32f1::output_pin scl('A', 10);
+  static hal::soft::bit_bang_i2c bit_bang_i2c(
+    hal::soft::bit_bang_i2c::pins{
+      .sda = &sda,
+      .scl = &scl,
+    }, counter);
+
+  p_list.i2c = &bit_bang_i2c;
+
+
+
 }
