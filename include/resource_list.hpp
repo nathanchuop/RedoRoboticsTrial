@@ -41,6 +41,10 @@ struct resource_list
   std::optional<hal::i2c*> i2c;
   std::optional<hal::pwm*> pwm;
 
+  std::optional<hal::output_pin*> g0_sda;
+  std::optional<hal::output_pin*> g1_scl;
+
+
 };
 
 /**

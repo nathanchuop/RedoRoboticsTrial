@@ -33,6 +33,7 @@ find_package(libhal-util REQUIRED CONFIG)
 find_package(libhal-sensor REQUIRED CONFIG)
 find_package(libhal-actuator REQUIRED CONFIG)
 
+
 add_executable(${PROJECT_NAME}
     src/main.cpp
     platforms/$ENV{LIBHAL_PLATFORM}.cpp
@@ -45,7 +46,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     libhal::$ENV{LIBHAL_PLATFORM_LIBRARY}
     libhal::util
     libhal::sensor
-    libhal::actuator)
+    libhal::actuator  )
 
 libhal_post_build(${PROJECT_NAME})
 libhal_disassemble(${PROJECT_NAME})
