@@ -32,6 +32,7 @@ find_package(libhal-$ENV{LIBHAL_PLATFORM_LIBRARY} REQUIRED CONFIG)
 find_package(libhal-util REQUIRED CONFIG)
 find_package(libhal-sensor REQUIRED CONFIG)
 find_package(libhal-actuator REQUIRED CONFIG)
+find_package(libhal-expander REQUIRED CONFIG)
 
 
 add_executable(${PROJECT_NAME}
@@ -46,7 +47,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     libhal::$ENV{LIBHAL_PLATFORM_LIBRARY}
     libhal::util
     libhal::sensor
-    libhal::actuator  )
+    libhal::actuator 
+    libhal::expander)
 
 libhal_post_build(${PROJECT_NAME})
 libhal_disassemble(${PROJECT_NAME})

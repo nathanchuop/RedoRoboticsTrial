@@ -27,5 +27,5 @@ class demos(ConanFile):
         self.requires("libhal-sensor/[^1.0.0 || latest]")
         self.requires('libhal-actuator/[^1.0.0 || latest]')
         #self.requires("libhal-util/[^5.4.0]")
-        #self.requires('libhal-expander/[1.1.0]')
+        self.requires("libhal-expander/[1.1.0 || latest]")
     

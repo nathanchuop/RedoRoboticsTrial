@@ -5,25 +5,66 @@
 #include <libhal-util/steady_clock.hpp>
 #include <libhal-util/serial.hpp>
 #include <libhal/pwm.hpp>
-//#include <libhal-expander/pca9685.hpp>
+// #include <libhal-pca/pca9685.hpp>
+#include <libhal-expander/pca9685.hpp>
+#include <libhal/units.hpp>
+
+
+// void pca_setup(resource_list& p_resources){
+
+//     using namespace std::chrono_literals;
+//     using namespace hal::literals;
+
+//     auto& clock = *p_resources.clock.value();
+//     auto& console = *p_resources.console.value();
+//     auto& i2c = *p_resources.i2c.value();
+    
+//     hal::print<1024>(console, "pca setting...");
+
+//     //hal::expander::pca9685 pca9685(i2c, 0b100'0000);
+
+// }
+
 
 
 void application(resource_list p_resources){
-    
+
+    using namespace std::chrono_literals;
     auto& console = *p_resources.console.value();
     auto& i2c = *p_resources.i2c.value();
-
     auto& clock = *p_resources.clock.value();
     auto& led = *p_resources.status_led.value();
-    using namespace std::chrono_literals;
+    auto& pwm = *p_resources.pwm.value();
+    hal::print<1024>(console, "initialize pwm");
+    
     
     for (int i = 0; i < 0xFF; i++) {
-    auto res = hal::probe(i2c, i);
+        auto res = hal::probe(i2c, i);
+        if (res) {
+            hal::print<1024>(console, "\nres: %d\n", i);
+        }
     }
     hal::sensor::mpu6050 mpu(i2c, 0x68); 
-    mpu.power_on();
-    
-    
+    hal::print<1024>(console, "initialize mpu");
+
+    // ==== for pca setup ====
+    //pca_setup(p_resources);
+    // =======================
+
+
+
+    hal::actuator::rc_servo::settings rc_servo_settings{
+        .frequency = 50,
+        // Total 180 deg, change for your use case.
+        .min_angle = -90,
+        .max_angle = 90,
+        // Change to 500us and 2500us if your rc servo
+        // supports those pulse widths.
+        .min_microseconds = 500,
+        .max_microseconds = 2400,
+      };
+    hal::actuator::rc_servo servo(pwm, rc_servo_settings);
+    hal::print<1024>(console, "initialize servo\n");
 
     // //expander pca9685
     // hal::expander::pca9685 pca(i2c, 0x40);
@@ -34,19 +75,32 @@ void application(resource_list p_resources){
     // //set servo to middle position
     // pwm0.duty_cycle(0.075f); //1.5ms duty cycle
 
+    hal::degrees degrees = -90;
+    hal::delay(clock, 200ms);
 
     while(true){
         //Looping forever
-        mpu.configure_full_scale(hal::sensor::mpu6050::max_acceleration::g2);
+        mpu.configure_full_scale(hal::sensor::mpu6050::max_acceleration::g2); 
+        hal::print<1024>(console, "mpu configured\n");
 
+        if (degrees > 90) {
+            degrees = 90;
+        } else {
+            degrees += 20;
+            
+        }
+        servo.position(degrees);
+        hal::delay(clock, 1000ms);
+
+        hal::print<1024>(console, "set servo pos\n");
 
         //flashing lights program
         auto read = mpu.read();
         hal::print<1024>(console, "x: %fg, y: %fg, z: %fg\n", read.x, read.y, read.z);
         led.level(true);
-        hal::delay(clock, 500ms);
+        hal::delay(clock, 100ms);
         led.level(false);
-        hal::delay(clock, 500ms);
+        hal::delay(clock, 100ms);
 
     }
 }

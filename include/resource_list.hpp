@@ -23,6 +23,7 @@
 #include <libhal/i2c.hpp>
 #include <libhal/accelerometer.hpp>
 #include <libhal-actuator/rc_servo.hpp>
+#include <libhal-expander/pca9685.hpp>
 
 struct resource_list
 {
@@ -55,3 +56,4 @@ struct resource_list
  * in the resoure list.
  */
 void initialize_platform(resource_list& p_list);
+void pca_setup(resource_list& p_list);
